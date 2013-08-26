@@ -21,6 +21,10 @@ import junit.framework.TestCase;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Unit test for {@link JsoMap}.
  */
@@ -102,9 +106,11 @@ public class JsoMapTest extends TestCase {
         JSONArray keys = map.getKeys();
         assertNotNull(keys);
         assertEquals(3, keys.length());
-        assertEquals("a", keys.getString(0));
-        assertEquals("c", keys.getString(1));
-        assertEquals("d", keys.getString(2));
+        Set<String> keySet = new HashSet<String>(keys.length());
+        for (int i = 0; i < keys.length(); i++) {
+            keySet.add(keys.getString(i));
+        }
+        assertEquals(new HashSet<String>(Arrays.asList("a", "c", "d")), keySet);
     }
 
     public void testGetObj() throws Exception {
@@ -215,10 +221,12 @@ public class JsoMapTest extends TestCase {
     public void testMap() throws Exception {
         JsoMap map = JsoMap.buildJsoMap(VALID_JSON);
         try {
-            // This should fail on the string "a".
+            // This should fail on the string "a" or the integer "c".
             map.map();
             fail("Expected ClassCastException.");
         } catch (ClassCastException e) {
+            // Expected.
+        } catch (IllegalArgumentException e) {
             // Expected.
         }
 
