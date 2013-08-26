@@ -198,10 +198,12 @@ public class JsoMapTest extends TestCase {
         JsoMap map = JsoMap.buildJsoMap(VALID_JSON);
 
         try {
-            // This should fail on the integer "c".
+            // This should fail on the integer "c" or the map "d".
             map.string();
             fail("Expected IllegalArgumentException.");
         } catch (IllegalArgumentException e) {
+            // Expected.
+        } catch (ClassCastException e) {
             // Expected.
         }
 
