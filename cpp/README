@@ -4,10 +4,6 @@ Intro
 The C++ version of libaddressinput library provides UI layout information and
 validation for address input forms.
 
-This is the boilerplate of the library that includes only this README and a
-build configuration file. The configuration file is able to build an empty unit
-tests binary.
-
 The library does not provide a UI. The user of the library must provide the user
 interface that uses libaddressinput. The user of the library must also provide a
 way to store data on disk and download data from the internet.
@@ -24,17 +20,17 @@ Dependencies
 
 The library depends on these tools and libraries:
 
-Gyp: Generates the build files.
+GYP: Generates the build files.
 Ninja: Executes the build files.
-Gtest: Used for unit tests.
+GTest: Used for unit tests.
 
 Most of these packages are available on Debian-like distributions. You can
 install them with this command:
 
 $ sudo apt-get install gyp ninja-build libgtest-dev
 
-Make sure that your version of Gyp is at least 0.1~svn1395. Older versions of
-Gyp do not generate the Ninja build files correctly. You can download a
+Make sure that your version of GYP is at least 0.1~svn1395. Older versions of
+GYP do not generate the Ninja build files correctly. You can download a
 new-enough version from http://packages.ubuntu.com/saucy/gyp.
 
 If your distribution does not include the binary packages for the dependencies,
@@ -48,9 +44,9 @@ Alternatively, you can download, build, and install these tools and libraries
 from source code. Their home pages contain information on how to accomplish
 that.
 
-https://code.google.com/p/gyp
-http://martine.github.io/ninja
-https://code.google.com/p/googletest
+https://code.google.com/p/gyp/
+http://martine.github.io/ninja/
+https://code.google.com/p/googletest/
 
 Build
 =====
@@ -67,4 +63,4 @@ Test
 
 These commands will execute the unit tests for the library:
 
-$ ./out/Release/libaddressinput_unittests
+$ out/Release/libaddressinput_unittests

@@ -17,12 +17,11 @@
 
     # Default include directories. Override with your system's include paths or
     # paths to your own implementations.
-    'libaddressinput_gtest_dir':      '/usr/include',
-    'libaddressinput_gtest_src_dir':  '/usr/src/gtest/src',
+    'gtest_dir':     '/usr/include',
+    'gtest_src_dir': '/usr/src/gtest',
   },
   'target_defaults': {
     'cflags': [
-      '-fpic',
       '-std=c++03',
     ],
     'configurations': {
@@ -59,7 +58,8 @@
       ],
       'include_dirs': [
         '<(DEPTH)',
-        '<(libaddressinput_gtest_dir)',
+        '<(gtest_dir)',
+        '<(gtest_src_dir)',
         '<(INTERMEDIATE_DIR)',
         '<(SHARED_INTERMEDIATE_DIR)',
       ],
@@ -67,16 +67,8 @@
         {
           'destination': '<(INTERMEDIATE_DIR)/src',
           'files': [
-            '<(libaddressinput_gtest_src_dir)/gtest-all.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-death-test.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-filepath.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-internal-inl.h',
-            '<(libaddressinput_gtest_src_dir)/gtest_main.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-port.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-printers.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-test-part.cc',
-            '<(libaddressinput_gtest_src_dir)/gtest-typed-test.cc',
+            '<(gtest_src_dir)/src/gtest-all.cc',
+            '<(gtest_src_dir)/src/gtest_main.cc',
           ],
         },
       ],
