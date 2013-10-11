@@ -38,6 +38,7 @@
       'target_name': 'libaddressinput',
       'type': '<(component)',
       'cflags': [
+        # http://gcc.gnu.org/wiki/Visibility
         '-fvisibility=hidden',
       ],
     },

@@ -47,7 +47,7 @@
         'conditions': [
           ['OS == "linux"', {
             'ldflags': [
-              # GTest needs to link to pthread.
+              # GTest needs to link to pthread on Linux.
               '-pthread',
             ],
           }],
