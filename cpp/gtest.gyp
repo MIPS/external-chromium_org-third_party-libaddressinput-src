@@ -28,10 +28,8 @@
       },
       'sources': [
         '<(INTERMEDIATE_DIR)/src/gtest-all.cc',
-        'test/main.cc',
       ],
       'include_dirs': [
-        '<(gtest_dir)',
         '<(gtest_src_dir)',
       ],
       'copies': [
@@ -43,6 +41,9 @@
         },
       ],
       'direct_dependent_settings': {
+        'include_dirs': [
+          '<(gtest_dir)',
+        ],
         'conditions': [
           ['OS == "linux"', {
             'ldflags': [

@@ -44,6 +44,9 @@
     {
       'target_name': 'libaddressinput_unittests',
       'type': 'executable',
+      'sources': [
+        'test/main.cc',
+      ],
       'dependencies': [
         'libaddressinput',
         'gtest.gyp:main',
