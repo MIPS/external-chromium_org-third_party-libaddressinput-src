@@ -14,11 +14,6 @@
 {
   'variables': {
     'component%': 'shared_library',
-
-    # Default include directories. Override with your system's include paths or
-    # paths to your own implementations.
-    'gtest_dir':     '/usr/include',
-    'gtest_src_dir': '/usr/src/gtest',
   },
   'target_defaults': {
     'cflags': [
@@ -49,32 +44,9 @@
     {
       'target_name': 'libaddressinput_unittests',
       'type': 'executable',
-      'sources': [
-        '<(INTERMEDIATE_DIR)/src/gtest-all.cc',
-        '<(INTERMEDIATE_DIR)/src/gtest_main.cc',
-      ],
       'dependencies': [
         'libaddressinput',
-      ],
-      'include_dirs': [
-        '<(gtest_src_dir)',
-      ],
-      'copies': [
-        {
-          'destination': '<(INTERMEDIATE_DIR)/src',
-          'files': [
-            '<(gtest_src_dir)/src/gtest-all.cc',
-            '<(gtest_src_dir)/src/gtest_main.cc',
-          ],
-        },
-      ],
-      'conditions': [
-        ['OS == "linux"', {
-          'ldflags': [
-            # GTest needs to link to pthread.
-            '-pthread',
-          ],
-        }],
+        'gtest.gyp:main',
       ],
     },
   ],
