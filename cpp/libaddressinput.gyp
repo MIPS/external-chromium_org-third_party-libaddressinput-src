@@ -57,11 +57,7 @@
         'libaddressinput',
       ],
       'include_dirs': [
-        '<(DEPTH)',
-        '<(gtest_dir)',
         '<(gtest_src_dir)',
-        '<(INTERMEDIATE_DIR)',
-        '<(SHARED_INTERMEDIATE_DIR)',
       ],
       'copies': [
         {
@@ -75,6 +71,7 @@
       'conditions': [
         ['OS == "linux"', {
           'ldflags': [
+            # GTest needs to link to pthread.
             '-pthread',
           ],
         }],
