@@ -54,12 +54,10 @@ class LocalizationTest : public testing::TestWithParam<int> {
 
 // Verifies that a custom message getter can be used.
 static const char kValidMessage[] = "Data";
-static const char kValidLanguageTag[] = "tlh";
 std::string GetValidMessage(int message_id) { return kValidMessage; }
 TEST_P(LocalizationTest, ValidStringGetterCanBeUsed) {
-  localization_.SetGetter(&GetValidMessage, kValidLanguageTag);
+  localization_.SetGetter(&GetValidMessage);
   EXPECT_EQ(kValidMessage, localization_.GetString(GetParam()));
-  EXPECT_EQ(kValidLanguageTag, localization_.GetLanguage());
 }
 
 // Verifies that the default language for messages does not have empty strings.
@@ -76,13 +74,6 @@ TEST_P(LocalizationTest, NoNewline) {
 TEST_P(LocalizationTest, NoDoubleSpace) {
   EXPECT_EQ(std::string::npos,
             localization_.GetString(GetParam()).find(std::string(2U, ' ')));
-}
-
-// Verifies that the default string is English.
-TEST_P(LocalizationTest, DefaultStringIsEnglish) {
-  std::string default_string = localization_.GetString(GetParam());
-  localization_.SetLanguage("en");
-  EXPECT_EQ(default_string, localization_.GetString(GetParam()));
 }
 
 // Tests all message identifiers.
@@ -130,24 +121,17 @@ TEST_F(LocalizationTest, InvalidMessageIsEmptyString) {
   EXPECT_TRUE(localization_.GetString(INVALID_MESSAGE_ID).empty());
 }
 
-// Verifies that the default language is English.
-TEST_F(LocalizationTest, DefaultLanguageIsEnglish) {
-  EXPECT_EQ("en", localization_.GetLanguage());
-}
-
 TEST(LocalizationGetErrorMessageTest, MissingRequiredPostalCode) {
   Localization localization;
   AddressData address;
   address.region_code = "CH";
-  EXPECT_EQ(std::string("You must provide a postal code, for example") +
-            " 2544,1211,1556,3030." +
+  EXPECT_EQ(std::string("You must provide a postal code, for example 2544.") +
             " Don't know your postal code? Find it out" +
             " <a href=\"http://www.post.ch/db/owa/pv_plz_pack/pr_main\">" +
             "here</a>.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          MISSING_REQUIRED_FIELD, true, true));
-  EXPECT_EQ(std::string("You must provide a postal code, for example") +
-            " 2544,1211,1556,3030.",
+  EXPECT_EQ("You must provide a postal code, for example 2544.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          MISSING_REQUIRED_FIELD, true, false));
   EXPECT_EQ("You can't leave this empty.",
@@ -162,15 +146,13 @@ TEST(LocalizationGetErrorMessageTest, MissingRequiredZipCode) {
   Localization localization;
   AddressData address;
   address.region_code = "US";
-  EXPECT_EQ(std::string("You must provide a ZIP code, for example") +
-            " 95014,22162-1010." +
+  EXPECT_EQ(std::string("You must provide a ZIP code, for example 95014.") +
             " Don't know your ZIP code? Find it out" +
             " <a href=\"https://tools.usps.com/go/ZipLookupAction!" +
             "input.action\">here</a>.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          MISSING_REQUIRED_FIELD, true, true));
-  EXPECT_EQ(std::string("You must provide a ZIP code, for example") +
-            " 95014,22162-1010.",
+  EXPECT_EQ("You must provide a ZIP code, for example 95014.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          MISSING_REQUIRED_FIELD, true, false));
   EXPECT_EQ("You can't leave this empty.",
@@ -342,16 +324,14 @@ TEST(LocalizationGetErrorMessageTest, InvalidFormatPostalCode) {
   AddressData address;
   address.region_code = "CH";
   EXPECT_EQ(std::string("This postal code format is not recognized. Example ") +
-            "of a valid postal code:" +
-            " 2544,1211,1556,3030." +
+            "of a valid postal code: 2544." +
             " Don't know your postal code? Find it out" +
             " <a href=\"http://www.post.ch/db/owa/pv_plz_pack/pr_main\">" +
             "here</a>.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          INVALID_FORMAT, true, true));
   EXPECT_EQ(std::string("This postal code format is not recognized. Example ") +
-            "of a valid postal code:" +
-            " 2544,1211,1556,3030.",
+            "of a valid postal code: 2544.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          INVALID_FORMAT, true, false));
   EXPECT_EQ("This postal code format is not recognized.",
@@ -367,16 +347,14 @@ TEST(LocalizationGetErrorMessageTest, InvalidFormatZipCode) {
   AddressData address;
   address.region_code = "US";
   EXPECT_EQ(std::string("This ZIP code format is not recognized. Example of ") +
-            "a valid ZIP code:" +
-            " 95014,22162-1010." +
+            "a valid ZIP code: 95014." +
             " Don't know your ZIP code? Find it out" +
             " <a href=\"https://tools.usps.com/go/ZipLookupAction!" +
             "input.action\">here</a>.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          INVALID_FORMAT, true, true));
   EXPECT_EQ(std::string("This ZIP code format is not recognized. Example of ") +
-            "a valid ZIP code:" +
-            " 95014,22162-1010.",
+            "a valid ZIP code: 95014.",
             localization.GetErrorMessage(address, POSTAL_CODE,
                                          INVALID_FORMAT, true, false));
   EXPECT_EQ("This ZIP code format is not recognized.",
