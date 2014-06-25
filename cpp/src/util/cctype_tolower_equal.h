@@ -11,28 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-// Post office box regular expressions.
 
-#ifndef I18N_ADDRESSINPUT_POST_BOX_MATCHERS_H_
-#define I18N_ADDRESSINPUT_POST_BOX_MATCHERS_H_
+#ifndef I18N_ADDRESSINPUT_UTIL_CCTYPE_TOLOWER_EQUAL_H_
+#define I18N_ADDRESSINPUT_UTIL_CCTYPE_TOLOWER_EQUAL_H_
 
-#include <vector>
+#include <functional>
+#include <string>
 
 namespace i18n {
 namespace addressinput {
 
-class Rule;
-struct RE2ptr;
-
-class PostBoxMatchers {
- public:
-  // Returns pointers to RE2 regular expression objects to test address lines
-  // for those languages that are relevant for |country_rule|.
-  static std::vector<const RE2ptr*> GetMatchers(const Rule& country_rule);
+// Performs case insensitive comparison of |a| and |b| by calling std::tolower()
+// from <cctype>.
+struct EqualToTolowerString
+    : public std::binary_function<std::string, std::string, bool> {
+  result_type operator()(const first_argument_type& a,
+                         const second_argument_type& b) const;
 };
 
-}  // namespace addressinput
-}  // namespace i18n
+}  // addressinput
+}  // i18n
 
-#endif  // I18N_ADDRESSINPUT_POST_BOX_MATCHERS_H_
+#endif  // I18N_ADDRESSINPUT_UTIL_CCTYPE_TOLOWER_EQUAL_H_
