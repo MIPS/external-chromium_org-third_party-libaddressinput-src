@@ -53,14 +53,10 @@ class IndexLess : public std::binary_function<std::string, std::string, bool> {
  public:
   result_type operator()(const first_argument_type& a,
                          const second_argument_type& b) const {
+    static const StringCompare kStringCompare;
     return kStringCompare.NaturalLess(a, b);
   }
-
- private:
-  static const StringCompare kStringCompare;
 };
-
-const StringCompare IndexLess::kStringCompare;
 
 }  // namespace
 
@@ -105,6 +101,7 @@ class Helper {
     (void)status;  // Prevent unused variable if assert() is optimized away.
 
     Json json;
+    std::string id;
     std::vector<const Rule*> sub_rules;
 
     if (!success) {
@@ -124,11 +121,10 @@ class Helper {
       }
       const Json& value = json.GetDictionaryValueForKey(*it);
 
-      if (!value.HasStringValueForKey("id")) {
+      if (!value.GetStringValueForKey("id", &id)) {
         success = false;
         goto callback;
       }
-      const std::string& id = value.GetStringValueForKey("id");
       assert(*it == id);  // Sanity check.
 
       size_t depth = std::count(id.begin(), id.end(), '/') - 1;
