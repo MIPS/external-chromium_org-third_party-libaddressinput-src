@@ -14,20 +14,20 @@
 
 #include <libaddressinput/address_formatter.h>
 
-#include <strings.h>
+#include <libaddressinput/address_data.h>
+#include <libaddressinput/address_field.h>
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <string>
 #include <vector>
-
-#include <libaddressinput/address_data.h>
-#include <libaddressinput/address_field.h>
 
 #include "format_element.h"
 #include "language.h"
 #include "region_data_constants.h"
 #include "rule.h"
+#include "util/cctype_tolower_equal.h"
 
 namespace i18n {
 namespace addressinput {
@@ -65,53 +65,6 @@ const char* kLanguagesThatUseAnArabicComma[] = {
   "ur",
   "uz"
 };
-
-// Case insensitive matcher for language tags.
-struct LanguageMatcher {
-  LanguageMatcher(const std::string& tag) : tag(tag) {}
-  std::string tag;
-  bool operator() (const std::string& s) {
-    return strcasecmp(tag.c_str(), s.c_str()) == 0;
-  }
-};
-
-std::string GetLineSeparatorForLanguage(const std::string& language_tag) {
-  Language address_language(language_tag);
-
-  // First deal with explicit script tags.
-  if (address_language.has_latin_script) {
-    return kCommaSeparator;
-  }
-
-  // Now guess something appropriate based on the base language.
-  const std::string& base_language = address_language.base;
-  if (std::find_if(kLanguagesThatUseSpace,
-                   kLanguagesThatUseSpace + arraysize(kLanguagesThatUseSpace),
-                   LanguageMatcher(base_language)) !=
-      kLanguagesThatUseSpace + arraysize(kLanguagesThatUseSpace)) {
-    return kSpaceSeparator;
-  } else if (std::find_if(kLanguagesThatHaveNoSeparator,
-                          kLanguagesThatHaveNoSeparator +
-                              arraysize(kLanguagesThatHaveNoSeparator),
-                          LanguageMatcher(base_language)) !=
-             kLanguagesThatHaveNoSeparator +
-                 arraysize(kLanguagesThatHaveNoSeparator)) {
-    return "";
-  } else if (std::find_if(kLanguagesThatUseAnArabicComma,
-                          kLanguagesThatUseAnArabicComma +
-                              arraysize(kLanguagesThatUseAnArabicComma),
-                          LanguageMatcher(base_language)) !=
-             kLanguagesThatUseAnArabicComma +
-                 arraysize(kLanguagesThatUseAnArabicComma)) {
-    return kArabicCommaSeparator;
-  }
-  // Either the language is a latin-script language, or no language was
-  // specified. In the latter case we still return ", " as the most common
-  // separator in use. In countries that don't use this, e.g. Thailand,
-  // addresses are often written in latin script where this would still be
-  // appropriate, so this is a reasonable default in the absence of information.
-  return kCommaSeparator;
-}
 
 void CombineLinesForLanguage(
     const std::vector<std::string>& lines, const std::string& language_tag,
@@ -191,6 +144,46 @@ void GetStreetAddressLinesAsSingleLine(
     const AddressData& address_data, std::string* line) {
   CombineLinesForLanguage(
       address_data.address_line, address_data.language_code, line);
+}
+
+std::string GetLineSeparatorForLanguage(const std::string& language_tag) {
+  Language address_language(language_tag);
+
+  // First deal with explicit script tags.
+  if (address_language.has_latin_script) {
+    return kCommaSeparator;
+  }
+
+  // Now guess something appropriate based on the base language.
+  const std::string& base_language = address_language.base;
+  if (std::find_if(kLanguagesThatUseSpace,
+                   kLanguagesThatUseSpace + arraysize(kLanguagesThatUseSpace),
+                   std::bind2nd(EqualToTolowerString(), base_language)) !=
+      kLanguagesThatUseSpace + arraysize(kLanguagesThatUseSpace)) {
+    return kSpaceSeparator;
+  } else if (std::find_if(
+                 kLanguagesThatHaveNoSeparator,
+                 kLanguagesThatHaveNoSeparator +
+                     arraysize(kLanguagesThatHaveNoSeparator),
+                 std::bind2nd(EqualToTolowerString(), base_language)) !=
+             kLanguagesThatHaveNoSeparator +
+                 arraysize(kLanguagesThatHaveNoSeparator)) {
+    return "";
+  } else if (std::find_if(
+                 kLanguagesThatUseAnArabicComma,
+                 kLanguagesThatUseAnArabicComma +
+                     arraysize(kLanguagesThatUseAnArabicComma),
+                 std::bind2nd(EqualToTolowerString(), base_language)) !=
+             kLanguagesThatUseAnArabicComma +
+                 arraysize(kLanguagesThatUseAnArabicComma)) {
+    return kArabicCommaSeparator;
+  }
+  // Either the language is a latin-script language, or no language was
+  // specified. In the latter case we still return ", " as the most common
+  // separator in use. In countries that don't use this, e.g. Thailand,
+  // addresses are often written in latin script where this would still be
+  // appropriate, so this is a reasonable default in the absence of information.
+  return kCommaSeparator;
 }
 
 }  // namespace addressinput

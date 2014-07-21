@@ -43,9 +43,8 @@ std::map<std::string, std::string> InitRegionData() {
       "\"languages\":\"en\""
       "}"));
   region_data.insert(std::make_pair("AD", "{"
-      "\"fmt\":\"%N%n%O%n%A%n%Z %S\","
-      "\"require\":\"AS\","
-      "\"state_name_type\":\"parish\","
+      "\"fmt\":\"%N%n%O%n%A%n%Z %C\","
+      "\"require\":\"A\","
       "\"zipex\":\"AD100,AD501,AD700\","
       "\"posturl\":\"http://www.correos.es/comun/CodigosPostales/1010_s-CodPostal.asp\?Provincia=\","
       "\"languages\":\"ca\""
@@ -119,7 +118,7 @@ std::map<std::string, std::string> InitRegionData() {
       "\"languages\":\"nl~pap\""
       "}"));
   region_data.insert(std::make_pair("AX", "{"
-      "\"fmt\":\"%O%n%N%n%A%nAX-%Z %C%n\u00c5LAND\","
+      "\"fmt\":\"%O%n%N%n%A%nAX-%Z %C%n\\u00c5LAND\","
       "\"require\":\"ACZ\","
       "\"zipex\":\"22150,22550,22240,22710,22270,22730,22430\","
       "\"posturl\":\"http://www.posten.ax/department.con\?iPage=123\","
@@ -329,7 +328,7 @@ std::map<std::string, std::string> InitRegionData() {
       "\"languages\":\"ar~fr\""
       "}"));
   region_data.insert(std::make_pair("DK", "{"
-      "\"fmt\":\"%O%n%N%n%A%n%Z %C\","
+      "\"fmt\":\"%N%n%O%n%A%n%Z %C\","
       "\"require\":\"ACZ\","
       "\"zipex\":\"8660,1566\","
       "\"posturl\":\"http://www.postdanmark.dk/da/Privat/Kundeservice/postnummerkort/Sider/Find-postnummer.aspx\","
@@ -634,7 +633,7 @@ std::map<std::string, std::string> InitRegionData() {
       "\"languages\":\"ar\""
       "}"));
   region_data.insert(std::make_pair("JP", "{"
-      "\"fmt\":\"\u3012%Z%n%S%C%n%A%n%O%n%N\","
+      "\"fmt\":\"\\u3012%Z%n%S%C%n%A%n%O%n%N\","
       "\"lfmt\":\"%N%n%O%n%A%n%C, %S%n%Z\","
       "\"require\":\"ACSZ\","
       "\"state_name_type\":\"prefecture\","
@@ -1062,8 +1061,9 @@ std::map<std::string, std::string> InitRegionData() {
       "\"languages\":\"sr-Cyrl~sr-Latn\""
       "}"));
   region_data.insert(std::make_pair("RU", "{"
-      "\"fmt\":\"%Z %C  %n%A%n%O%n%N\","
+      "\"fmt\":\"%N%n%O%n%A%n%C%n%S%n%Z\","
       "\"require\":\"ACZ\","
+      "\"state_name_type\":\"oblast\","
       "\"zipex\":\"125075,247112,103375\","
       "\"posturl\":\"http://info.russianpost.ru/servlet/department\","
       "\"languages\":\"ru\""
