@@ -16,7 +16,9 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <string>
 #include <utility>
@@ -72,7 +74,10 @@ const LookupKeyUtil& GetAggregateLookupKeyUtil() {
 std::map<std::string, std::string> InitData() {
   std::map<std::string, std::string> data;
   std::ifstream file(kDataFileName);
-  assert(file.is_open());
+  if (!file.is_open()) {
+    std::cerr << "Error opening \"" << kDataFileName << "\"." << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 
   std::string line;
   while (file.good()) {
@@ -101,8 +106,9 @@ std::map<std::string, std::string> InitData() {
                       kDataKeyPrefixLength) == 0) {
         // Example aggregate URL:
         //     test:///aggregate/data/CH
-        const std::string& aggregate_url = GetAggregateLookupKeyUtil()
-            .GetUrlForKey(key.substr(0, kAggregateDataKeyLength));
+        const std::string& aggregate_url =
+            GetAggregateLookupKeyUtil().GetUrlForKey(
+                key.substr(0, kAggregateDataKeyLength));
 
         std::map<std::string, std::string>::iterator aggregate_data_it =
             data.find(aggregate_url);
