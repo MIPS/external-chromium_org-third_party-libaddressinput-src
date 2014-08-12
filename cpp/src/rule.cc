@@ -14,22 +14,22 @@
 
 #include "rule.h"
 
-#include <libaddressinput/address_field.h>
-
+#include <cassert>
 #include <cstddef>
 #include <map>
 #include <string>
 #include <utility>
 
+#include <re2/re2.h>
+
 #include "address_field_util.h"
+#include "format_element.h"
 #include "grit.h"
 #include "messages.h"
 #include "region_data_constants.h"
 #include "util/json.h"
 #include "util/re2ptr.h"
 #include "util/string_split.h"
-
-#include <re2/re2.h>
 
 namespace i18n {
 namespace addressinput {
@@ -138,6 +138,7 @@ const Rule& Rule::GetDefault() {
 }
 
 void Rule::CopyFrom(const Rule& rule) {
+  assert(this != &rule);
   id_ = rule.id_;
   format_ = rule.format_;
   latin_format_ = rule.latin_format_;

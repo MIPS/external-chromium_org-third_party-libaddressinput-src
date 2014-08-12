@@ -16,8 +16,10 @@
 
 #include <libaddressinput/address_data.h>
 #include <libaddressinput/address_field.h>
+#include <libaddressinput/util/basictypes.h>
 
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <functional>
 #include <string>
@@ -66,86 +68,6 @@ const char* kLanguagesThatUseAnArabicComma[] = {
   "uz"
 };
 
-void CombineLinesForLanguage(
-    const std::vector<std::string>& lines, const std::string& language_tag,
-    std::string *line) {
-  if (lines.size() > 0) {
-    line->assign(lines[0]);
-  }
-  std::string separator = GetLineSeparatorForLanguage(language_tag);
-  for (std::vector<std::string>::const_iterator it = lines.begin() + 1;
-       it < lines.end(); ++it) {
-    line->append(separator);
-    line->append(*it);
-  }
-}
-
-}  // namespace
-
-void GetFormattedNationalAddress(
-    const AddressData& address_data, std::vector<std::string>* lines) {
-  assert(lines != NULL);
-  lines->clear();
-
-  Rule rule;
-  rule.CopyFrom(Rule::GetDefault());
-  // TODO: Eventually, we should get the best rule for this country and
-  // language, rather than just for the country.
-  rule.ParseSerializedRule(RegionDataConstants::GetRegionData(
-      address_data.region_code));
-
-  Language language(address_data.language_code);
-
-  // If latinized rules are available and the |language_code| of this address is
-  // explicitly tagged as being Latin, then use the latinized formatting rules.
-  const std::vector<FormatElement>& format =
-      language.has_latin_script && !rule.GetLatinFormat().empty()
-          ? rule.GetLatinFormat() : rule.GetFormat();
-
-  std::string line;
-  for (size_t i = 0; i < format.size(); ++i) {
-    FormatElement element = format[i];
-    if (element.IsNewline()) {
-      if (!line.empty()) {
-        lines->push_back(line);
-        line.clear();
-      }
-    } else if (element.IsField()) {
-      AddressField field = element.GetField();
-      if (field == STREET_ADDRESS) {
-        // The field "street address" represents the street address lines of an
-        // address, so there can be multiple values.
-        if (!line.empty()) {
-          lines->push_back(line);
-          line.clear();
-        }
-        lines->insert(lines->end(), address_data.address_line.begin(),
-                      address_data.address_line.end());
-      } else {
-        line.append(address_data.GetFieldValue(field));
-      }
-    } else {
-      line.append(element.GetLiteral());
-    }
-  }
-  if (!line.empty()) {
-    lines->push_back(line);
-  }
-}
-
-void GetFormattedNationalAddressLine(
-    const AddressData& address_data, std::string* line) {
-  std::vector<std::string> address_lines;
-  GetFormattedNationalAddress(address_data, &address_lines);
-  CombineLinesForLanguage(address_lines, address_data.language_code, line);
-}
-
-void GetStreetAddressLinesAsSingleLine(
-    const AddressData& address_data, std::string* line) {
-  CombineLinesForLanguage(
-      address_data.address_line, address_data.language_code, line);
-}
-
 std::string GetLineSeparatorForLanguage(const std::string& language_tag) {
   Language address_language(language_tag);
 
@@ -184,6 +106,89 @@ std::string GetLineSeparatorForLanguage(const std::string& language_tag) {
   // addresses are often written in latin script where this would still be
   // appropriate, so this is a reasonable default in the absence of information.
   return kCommaSeparator;
+}
+
+void CombineLinesForLanguage(const std::vector<std::string>& lines,
+                             const std::string& language_tag,
+                             std::string* line) {
+  line->clear();
+  std::string separator = GetLineSeparatorForLanguage(language_tag);
+  for (std::vector<std::string>::const_iterator it = lines.begin();
+       it != lines.end();
+       ++it) {
+    if (it != lines.begin()) {
+      line->append(separator);
+    }
+    line->append(*it);
+  }
+}
+
+}  // namespace
+
+void GetFormattedNationalAddress(
+    const AddressData& address_data, std::vector<std::string>* lines) {
+  assert(lines != NULL);
+  lines->clear();
+
+  Rule rule;
+  rule.CopyFrom(Rule::GetDefault());
+  // TODO: Eventually, we should get the best rule for this country and
+  // language, rather than just for the country.
+  rule.ParseSerializedRule(RegionDataConstants::GetRegionData(
+      address_data.region_code));
+
+  Language language(address_data.language_code);
+
+  // If latinized rules are available and the |language_code| of this address is
+  // explicitly tagged as being Latin, then use the latinized formatting rules.
+  const std::vector<FormatElement>& format =
+      language.has_latin_script && !rule.GetLatinFormat().empty()
+          ? rule.GetLatinFormat()
+          : rule.GetFormat();
+
+  std::string line;
+  for (size_t i = 0; i < format.size(); ++i) {
+    FormatElement element = format[i];
+    if (element.IsNewline()) {
+      if (!line.empty()) {
+        lines->push_back(line);
+        line.clear();
+      }
+    } else if (element.IsField()) {
+      AddressField field = element.GetField();
+      if (field == STREET_ADDRESS) {
+        // The field "street address" represents the street address lines of an
+        // address, so there can be multiple values.
+        if (!line.empty()) {
+          lines->push_back(line);
+          line.clear();
+        }
+        lines->insert(lines->end(),
+                      address_data.address_line.begin(),
+                      address_data.address_line.end());
+      } else {
+        line.append(address_data.GetFieldValue(field));
+      }
+    } else {
+      line.append(element.GetLiteral());
+    }
+  }
+  if (!line.empty()) {
+    lines->push_back(line);
+  }
+}
+
+void GetFormattedNationalAddressLine(
+    const AddressData& address_data, std::string* line) {
+  std::vector<std::string> address_lines;
+  GetFormattedNationalAddress(address_data, &address_lines);
+  CombineLinesForLanguage(address_lines, address_data.language_code, line);
+}
+
+void GetStreetAddressLinesAsSingleLine(
+    const AddressData& address_data, std::string* line) {
+  CombineLinesForLanguage(
+      address_data.address_line, address_data.language_code, line);
 }
 
 }  // namespace addressinput

@@ -34,12 +34,13 @@
 
 namespace {
 
+using i18n::addressinput::BuildCallback;
 using i18n::addressinput::FakeDownloader;
 using i18n::addressinput::MockDownloader;
 using i18n::addressinput::NullStorage;
 using i18n::addressinput::Retriever;
-using i18n::addressinput::Storage;
 using i18n::addressinput::scoped_ptr;
+using i18n::addressinput::Storage;
 
 const char kKey[] = "data/CA/AB--fr";
 
@@ -63,19 +64,16 @@ class RetrieverTest : public testing::Test {
                    new NullStorage),
         success_(false),
         key_(),
-        data_() {}
+        data_(),
+        data_ready_(BuildCallback(this, &RetrieverTest::OnDataReady)) {}
 
   virtual ~RetrieverTest() {}
-
-  Retriever::Callback* BuildCallback() {
-    return i18n::addressinput::BuildCallback(
-        this, &RetrieverTest::OnDataReady);
-  }
 
   Retriever retriever_;
   bool success_;
   std::string key_;
   std::string data_;
+  const scoped_ptr<const Retriever::Callback> data_ready_;
 
  private:
   void OnDataReady(bool success,
@@ -90,8 +88,7 @@ class RetrieverTest : public testing::Test {
 };
 
 TEST_F(RetrieverTest, RetrieveData) {
-  scoped_ptr<Retriever::Callback> callback(BuildCallback());
-  retriever_.Retrieve(kKey, *callback);
+  retriever_.Retrieve(kKey, *data_ready_);
 
   EXPECT_TRUE(success_);
   EXPECT_EQ(kKey, key_);
@@ -100,11 +97,8 @@ TEST_F(RetrieverTest, RetrieveData) {
 }
 
 TEST_F(RetrieverTest, ReadDataFromStorage) {
-  scoped_ptr<Retriever::Callback> callback1(BuildCallback());
-  retriever_.Retrieve(kKey, *callback1);
-
-  scoped_ptr<Retriever::Callback> callback2(BuildCallback());
-  retriever_.Retrieve(kKey, *callback2);
+  retriever_.Retrieve(kKey, *data_ready_);
+  retriever_.Retrieve(kKey, *data_ready_);
 
   EXPECT_TRUE(success_);
   EXPECT_EQ(kKey, key_);
@@ -115,8 +109,7 @@ TEST_F(RetrieverTest, ReadDataFromStorage) {
 TEST_F(RetrieverTest, MissingKeyReturnsEmptyData) {
   static const char kMissingKey[] = "junk";
 
-  scoped_ptr<Retriever::Callback> callback(BuildCallback());
-  retriever_.Retrieve(kMissingKey, *callback);
+  retriever_.Retrieve(kMissingKey, *data_ready_);
 
   EXPECT_TRUE(success_);
   EXPECT_EQ(kMissingKey, key_);
@@ -129,8 +122,7 @@ TEST_F(RetrieverTest, FaultyDownloader) {
                           new MockDownloader,
                           new NullStorage);
 
-  scoped_ptr<Retriever::Callback> callback(BuildCallback());
-  bad_retriever.Retrieve(kKey, *callback);
+  bad_retriever.Retrieve(kKey, *data_ready_);
 
   EXPECT_FALSE(success_);
   EXPECT_EQ(kKey, key_);
@@ -167,8 +159,7 @@ TEST_F(RetrieverTest, UseStaleDataWhenDownloaderFails) {
   Retriever resilient_retriever(
       MockDownloader::kMockDataUrl, new MockDownloader, stale_storage);
 
-  scoped_ptr<Retriever::Callback> callback(BuildCallback());
-  resilient_retriever.Retrieve(kKey, *callback);
+  resilient_retriever.Retrieve(kKey, *data_ready_);
 
   EXPECT_TRUE(success_);
   EXPECT_EQ(kKey, key_);
@@ -182,8 +173,7 @@ TEST_F(RetrieverTest, DoNotUseStaleDataWhenDownloaderSucceeds) {
   Retriever resilient_retriever(
       FakeDownloader::kFakeDataUrl, new FakeDownloader, stale_storage);
 
-  scoped_ptr<Retriever::Callback> callback(BuildCallback());
-  resilient_retriever.Retrieve(kKey, *callback);
+  resilient_retriever.Retrieve(kKey, *data_ready_);
 
   EXPECT_TRUE(success_);
   EXPECT_EQ(kKey, key_);

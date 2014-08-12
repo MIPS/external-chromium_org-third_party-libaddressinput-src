@@ -18,6 +18,7 @@
 #include <libaddressinput/address_field.h>
 #include <libaddressinput/util/basictypes.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <functional>
@@ -97,8 +98,9 @@ void LookupKey::FromAddress(const AddressData& address) {
     }
   }
   Language address_language(address.language_code);
-  std::string language_tag_no_latn = address_language.has_latin_script ?
-      address_language.base : address_language.tag;
+  std::string language_tag_no_latn = address_language.has_latin_script
+                                         ? address_language.base
+                                         : address_language.tag;
   if (ShouldSetLanguageForKey(language_tag_no_latn, address.region_code)) {
     language_ = language_tag_no_latn;
   }
@@ -109,7 +111,8 @@ void LookupKey::FromLookupKey(const LookupKey& parent,
   assert(parent.nodes_.size() < arraysize(kHierarchy));
   assert(!child_node.empty());
 
-  nodes_ = parent.nodes_;
+  // Copy its nodes if this isn't the parent object.
+  if (this != &parent) nodes_ = parent.nodes_;
   AddressField child_field = kHierarchy[nodes_.size()];
   nodes_.insert(std::make_pair(child_field, child_node));
 }

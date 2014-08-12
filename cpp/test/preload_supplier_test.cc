@@ -20,14 +20,14 @@
 #include <libaddressinput/util/basictypes.h>
 #include <libaddressinput/util/scoped_ptr.h>
 
-#include "fake_downloader.h"
-#include "lookup_key.h"
-#include "rule.h"
-
 #include <cstddef>
 #include <string>
 
 #include <gtest/gtest.h>
+
+#include "fake_downloader.h"
+#include "lookup_key.h"
+#include "rule.h"
 
 namespace {
 
@@ -51,7 +51,7 @@ class PreloadSupplierTest : public testing::Test {
   virtual ~PreloadSupplierTest() {}
 
   PreloadSupplier supplier_;
-  scoped_ptr<PreloadSupplier::Callback> loaded_callback_;
+  const scoped_ptr<const PreloadSupplier::Callback> loaded_callback_;
 
  private:
   void OnLoaded(bool success, const std::string& region_code, int num_rules) {

@@ -16,6 +16,9 @@
 
 #include "region_data_constants.h"
 
+#include <libaddressinput/address_field.h>
+#include <libaddressinput/util/basictypes.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <map>
@@ -24,10 +27,8 @@
 #include <utility>
 #include <vector>
 
-#include <libaddressinput/address_field.h>
-#include <libaddressinput/util/basictypes.h>
-
 #include "address_field_util.h"
+#include "format_element.h"
 #include "lookup_key.h"
 
 namespace i18n {
@@ -1396,8 +1397,10 @@ struct SelectFirst {
 
 std::vector<std::string> InitRegionCodes() {
   std::vector<std::string> region_codes(GetAllRegionData().size());
-  std::transform(GetAllRegionData().begin(), GetAllRegionData().end(),
-                 region_codes.begin(), SelectFirst());
+  std::transform(GetAllRegionData().begin(),
+                 GetAllRegionData().end(),
+                 region_codes.begin(),
+                 SelectFirst());
   return region_codes;
 }
 
